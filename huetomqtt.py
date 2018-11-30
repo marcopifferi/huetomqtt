@@ -7,13 +7,13 @@ import time
 import paho.mqtt.client as mqtt
 
 client = mqtt.Client()
-client.connect("192.168.1.252", 1883, 60)
+client.connect("localhost", 1883, 60)
 client.loop_start()
 
 
 
 while True:
-    b = Bridge('192.168.1.252')
+    b = Bridge('localhost')
     
     sensors = b.get_sensor_objects('id')
     sensorDb = dict()
