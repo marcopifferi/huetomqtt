@@ -58,7 +58,7 @@ while True:
             print("dewpoint {}".format(dewpoint))
     
         if  humidity is not None or temperature is not None or pressure is not None:
-            objectname = ss.uniqueid[:26]
+            objectname = ss.uniqueid[:26].replace(":", "_")
             print(objectname)
             if  temperature is not None:
                 client.publish(objectname +"/temperature", temperature)
