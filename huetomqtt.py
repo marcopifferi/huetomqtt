@@ -70,7 +70,7 @@ while True:
                 client.publish(objectname +"/dewpoint", dewpoint)
         print(' ')
                 
-    time.sleep(60)
+    time.sleep(15)
         
         
             
