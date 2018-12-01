@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import sys
 from phue import Bridge
 import numpy as np
 import time
@@ -10,7 +11,32 @@ client = mqtt.Client()
 client.connect("localhost", 1883, 60)
 client.loop_start()
 
-
+# approximation valid for
+# 0 degC < T < 60 degC
+# 1% < RH < 100%
+# 0 degC < Td < 50 degC 
+ 
+ 
+def dewpoint_approximation(T,RH):
+    # constants
+    _a = 17.271
+    _b = 237.7 # degC
+ 
+    Td = (_b * gamma(T,RH)) / (_a - gamma(T,RH))
+ 
+    return Td
+ 
+ 
+def gamma(T,RH):
+    # constants
+    _a = 17.271
+    _b = 237.7 # degC
+ 
+    g = (_a * T / (_b + T)) + np.log(RH/100.0)
+ 
+    return g
+ 
+ 
 
 while True:
     b = Bridge('localhost')
@@ -26,16 +52,6 @@ while True:
             sensorDb[sensorKey] = []
         sensorDb[sensorKey].append(sensors[id])
     
-    def dew_point( RH,T ):
-        L = np.log10(RH / 100)
-        M = 17.27 * T
-        N = 237.3 + T
-
-        B = (L + (M / N)) / 17.27
-
-        D = (237.3 * B) / (1 - B)
-        return D
-
     for s in sensorDb.keys():
         temperature = None
         humidity = None
@@ -54,7 +70,8 @@ while True:
                 pressure = float(ss.state['pressure'])
                 print("pressure {}".format(pressure))
         if  humidity is not None and temperature is not None: 
-            dewpoint = dew_point(humidity,temperature)
+            dewpoint = dewpoint_approximation(temperature,humidity)
+            
             print("dewpoint {}".format(dewpoint))
     
         if  humidity is not None or temperature is not None or pressure is not None:
